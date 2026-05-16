@@ -63,8 +63,14 @@ class NewsService {
 
   ImpactLevel _determineImpact(String headline) {
     final lower = headline.toLowerCase();
-    if (lower.contains("surge") || lower.contains("rise") || lower.contains("gain") || lower.contains("growth")) return ImpactLevel.positive;
-    if (lower.contains("fall") || lower.contains("drop") || lower.contains("slump") || lower.contains("loss")) return ImpactLevel.negative;
+    if (lower.contains("surge") ||
+        lower.contains("rise") ||
+        lower.contains("gain") ||
+        lower.contains("growth")) return ImpactLevel.positive;
+    if (lower.contains("fall") ||
+        lower.contains("drop") ||
+        lower.contains("slump") ||
+        lower.contains("loss")) return ImpactLevel.negative;
     return ImpactLevel.neutral;
   }
 
@@ -75,19 +81,23 @@ class NewsService {
 
   List<String> _generateKeyTakeaways(String headline, String summary) {
     List<String> takeaways = [];
-    if (headline.toLowerCase().contains("surge") || headline.toLowerCase().contains("rise")) {
+    if (headline.toLowerCase().contains("surge") ||
+        headline.toLowerCase().contains("rise")) {
       takeaways.add("Bullish momentum detected in recent trading sessions.");
-    } else if (headline.toLowerCase().contains("fall") || headline.toLowerCase().contains("drop")) {
+    } else if (headline.toLowerCase().contains("fall") ||
+        headline.toLowerCase().contains("drop")) {
       takeaways.add("Bearish pressure mounting as investors react to new data.");
     } else {
       takeaways.add("Market remains cautious amid ongoing economic uncertainty.");
     }
     if (summary.isNotEmpty && summary.length > 20) {
-      takeaways.add(summary.split('.').first + ".");
+      takeaways.add("${summary.split('.').first}.");
     } else {
-      takeaways.add("Analysts are closely monitoring price action for breakout signals.");
+      takeaways.add(
+          "Analysts are closely monitoring price action for breakout signals.");
     }
-    takeaways.add("Historical volatility suggests potential for upcoming price discovery.");
+    takeaways.add(
+        "Historical volatility suggests potential for upcoming price discovery.");
     return takeaways;
   }
 }

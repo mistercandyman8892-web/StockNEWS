@@ -65,13 +65,13 @@ class RootScreen extends StatelessWidget {
     final appProvider = context.watch<AppProvider>();
 
     if (!appProvider.isLoggedIn) {
-      return const LoginScreen();
+      return LoginScreen();
     }
 
     if (!appProvider.isOnboarded) {
-      return const OnboardingScreen();
+      return OnboardingScreen();
     }
 
-    return const DashboardScreen();
+    return DashboardScreen();
   }
 }

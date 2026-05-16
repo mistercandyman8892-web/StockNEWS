@@ -1,11 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../models/models.dart';
 import '../services/news_service.dart';
 
 class AppProvider with ChangeNotifier {
   final NewsService _newsService = NewsService();
-  final GoogleSignIn _googleSignIn = GoogleSignIn();
+  final GoogleSignIn _googleSignIn = GoogleSignIn(
+    scopes: ['email'],
+  );
+
+  AppProvider() {
+    _loadPreferences();
+  }
 
   bool _isLoggedIn = false;
   bool _isOnboarded = false;
@@ -34,36 +41,50 @@ class AppProvider with ChangeNotifier {
     Stock(id: "8", symbol: "VTI", name: "Vanguard Total Stock", category: "ETF"),
   ];
 
-  Future<void> login() async {
-    try {
-      final account = await _googleSignIn.signIn();
-      if (account != null) {
-        _userName = account.displayName ?? "Trader";
-      }
-    } catch (e) {
-      print("Google Sign-In failed: $e");
-    }
-    _isLoggedIn = true;
+  Future<void> _loadPreferences() async {
+    final prefs = await SharedPreferences.getInstance();
+    _isOnboarded = prefs.getBool('isOnboarded') ?? false;
+    _selectedSymbols = prefs.getStringList('selectedSymbols') ?? [];
+    _userName = prefs.getString('userName') ?? "Trader";
     notifyListeners();
   }
 
-  void logout() async {
+  Future<void> login() async {
+    try {
+      final GoogleSignInAccount? account = await _googleSignIn.signIn();
+      if (account != null) {
+        _userName = account.displayName ?? "Trader";
+        _isLoggedIn = true;
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.setString('userName', _userName);
+        notifyListeners();
+      }
+    } catch (e) {
+      debugPrint("Google Sign-In failed: $e");
+    }
+  }
+
+  Future<void> logout() async {
     await _googleSignIn.signOut();
     _isLoggedIn = false;
     notifyListeners();
   }
 
-  void completeOnboarding() {
+  Future<void> completeOnboarding() async {
     _isOnboarded = true;
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('isOnboarded', true);
     notifyListeners();
   }
 
-  void toggleSymbol(String symbol) {
+  Future<void> toggleSymbol(String symbol) async {
     if (_selectedSymbols.contains(symbol)) {
       _selectedSymbols.remove(symbol);
     } else {
       _selectedSymbols.add(symbol);
     }
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setStringList('selectedSymbols', _selectedSymbols);
     notifyListeners();
   }
 
