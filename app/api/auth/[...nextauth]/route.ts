@@ -8,9 +8,6 @@ export const authOptions = {
       clientSecret: process.env.GOOGLE_CLIENT_SECRET || "MOCK_CLIENT_SECRET",
     }),
   ],
-  pages: {
-    signIn: "/auth/signin",
-  },
 };
 
 const handler = NextAuth(authOptions);

@@ -13,7 +13,7 @@ export function Login({ onLogin }: LoginProps) {
   const handleGoogleLogin = () => {
     // In a real environment, this initiates OAuth.
     // For this demo, we'll just call onLogin to proceed to onboarding.
-    // signIn("google", { callbackUrl: "/" });
+    // In a production app, we would use signIn("google").
     onLogin();
   };
 
