@@ -1,25 +1,18 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { NEWS_STORIES } from "@/lib/data";
+import { NewsStory } from "@/lib/types";
 import { StoryCard } from "./StoryCard";
 import { motion } from "framer-motion";
 import { ChevronRight, ChevronLeft, RotateCcw, X } from "lucide-react";
 
 interface StoryFeedProps {
-  selectedSymbols: string[];
-  onExit: () => void;
+  stories: NewsStory[];
+  onAllStoriesEnd: () => void;
 }
 
-export function StoryFeed({ selectedSymbols, onExit }: StoryFeedProps) {
+export function StoryFeed({ stories, onAllStoriesEnd }: StoryFeedProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
-
-  // Filter stories based on selected symbols
-  const filteredStories = NEWS_STORIES.filter(story =>
-    story.impact.affectedSymbols.some(symbol => selectedSymbols.includes(symbol))
-  );
-
-  const stories = filteredStories.length > 0 ? filteredStories : NEWS_STORIES;
 
   const nextStory = () => {
     if (currentIndex < stories.length - 1) {
@@ -64,7 +57,7 @@ export function StoryFeed({ selectedSymbols, onExit }: StoryFeedProps) {
 
       {/* Exit Button */}
       <button
-        onClick={onExit}
+        onClick={onAllStoriesEnd}
         className="absolute top-8 right-6 z-50 p-2 rounded-full bg-black/40 backdrop-blur-md border border-white/10 hover:bg-black/60 transition-colors"
       >
         <X className="h-5 w-5" />

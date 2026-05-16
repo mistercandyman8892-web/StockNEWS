@@ -8,10 +8,10 @@ import { Search, Check, TrendingUp, Briefcase } from "lucide-react";
 import { motion } from "framer-motion";
 
 interface SelectionScreenProps {
-  onComplete: (selectedSymbols: string[]) => void;
+  onConfirm: (selectedSymbols: string[]) => void;
 }
 
-export function SelectionScreen({ onComplete }: SelectionScreenProps) {
+export function SelectionScreen({ onConfirm }: SelectionScreenProps) {
   const [selected, setSelected] = useState<string[]>([]);
   const [search, setSearch] = useState("");
 
@@ -113,7 +113,7 @@ export function SelectionScreen({ onComplete }: SelectionScreenProps) {
       <div className="fixed bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-background via-background/90 to-transparent">
         <div className="max-w-2xl mx-auto w-full">
           <button
-            onClick={() => onComplete(selected)}
+            onClick={() => onConfirm(selected)}
             disabled={selected.length === 0}
             className="w-full bg-primary text-primary-foreground font-bold py-5 rounded-2xl disabled:opacity-50 disabled:cursor-not-allowed shadow-2xl transition-transform active:scale-[0.98]"
           >

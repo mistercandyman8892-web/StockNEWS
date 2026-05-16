@@ -1,51 +1,68 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import { useState } from "react";
 import { SelectionScreen } from "@/components/SelectionScreen";
 import { StoryFeed } from "@/components/StoryFeed";
-import { AnimatePresence, motion } from "framer-motion";
+import { Onboarding } from "@/components/Onboarding";
+import { Dashboard } from "@/components/Dashboard";
+import { NEWS_STORIES } from "@/lib/data";
+
+type AppPhase = "onboarding" | "selection" | "dashboard" | "stories";
 
 export default function Home() {
-  const [selectedSymbols, setSelectedSymbols] = useState<string[] | null>(null);
-  const [mounted, setMounted] = useState(false);
+  const [phase, setPhase] = useState<AppPhase>("onboarding");
+  const [selectedSymbols, setSelectedSymbols] = useState<string[]>([]);
+  const [userGoals, setUserGoals] = useState<string[]>([]);
 
-  // Prevent hydration mismatch
-  useEffect(() => {
-    setMounted(true);
-  }, []);
+  // Filtering stories based on selected symbols
+  // If no symbols selected (unlikely due to UI), show all
+  const filteredStories = NEWS_STORIES.filter((story) =>
+    story.impact.affectedSymbols.some((symbol) =>
+      selectedSymbols.includes(symbol)
+    )
+  );
 
-  if (!mounted) return null;
+  // Fallback to all stories if filtering results in too few stories for the demo
+  const displayStories = filteredStories.length > 0 ? filteredStories : NEWS_STORIES;
+
+  const handleOnboardingComplete = (goals: string[]) => {
+    setUserGoals(goals);
+    setPhase("selection");
+  };
+
+  const handleSelectionComplete = (symbols: string[]) => {
+    setSelectedSymbols(symbols);
+    setPhase("dashboard");
+  };
+
+  const handleStartStories = () => {
+    setPhase("stories");
+  };
+
+  const handleStoriesEnd = () => {
+    setPhase("dashboard");
+  };
 
   return (
-    <main className="min-h-screen bg-background text-foreground selection:bg-primary selection:text-primary-foreground">
-      <AnimatePresence mode="wait">
-        {!selectedSymbols ? (
-          <motion.div
-            key="selection"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.5 }}
-          >
-            <SelectionScreen
-              onComplete={(symbols) => setSelectedSymbols(symbols)}
-            />
-          </motion.div>
-        ) : (
-          <motion.div
-            key="feed"
-            initial={{ opacity: 0, scale: 1.1 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.9 }}
-            transition={{ duration: 0.5, ease: "circOut" }}
-          >
-            <StoryFeed
-              selectedSymbols={selectedSymbols}
-              onExit={() => setSelectedSymbols(null)}
-            />
-          </motion.div>
-        )}
-      </AnimatePresence>
+    <main className="min-h-screen bg-background">
+      {phase === "onboarding" && (
+        <Onboarding onComplete={handleOnboardingComplete} />
+      )}
+
+      {phase === "selection" && (
+        <SelectionScreen onConfirm={handleSelectionComplete} />
+      )}
+
+      {phase === "dashboard" && (
+        <Dashboard
+          onStartStories={handleStartStories}
+          selectedSymbols={selectedSymbols}
+        />
+      )}
+
+      {phase === "stories" && (
+        <StoryFeed stories={displayStories} onAllStoriesEnd={handleStoriesEnd} />
+      )}
     </main>
   );
 }

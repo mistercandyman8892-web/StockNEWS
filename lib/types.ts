@@ -4,6 +4,8 @@ export interface Stock {
   name: string;
   type: "stock" | "mutual_fund";
   category: string;
+  price?: number;
+  change?: number;
 }
 
 export type ImpactLevel = "positive" | "negative" | "neutral";
@@ -25,4 +27,18 @@ export interface NewsStory {
 
 export interface UserPortfolio {
   selectedSymbols: string[];
+  goals: string[];
+}
+
+export interface OnboardingStep {
+  id: string;
+  title: string;
+  description: string;
+  imageUrl?: string;
+}
+
+export interface DashboardData {
+  portfolioValue: number;
+  dailyChange: number;
+  topMoves: Array<{ symbol: string; change: number }>;
 }
