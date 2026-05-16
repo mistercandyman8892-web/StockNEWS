@@ -5,25 +5,41 @@ import { SelectionScreen } from "@/components/SelectionScreen";
 import { StoryFeed } from "@/components/StoryFeed";
 import { Onboarding } from "@/components/Onboarding";
 import { Dashboard } from "@/components/Dashboard";
+import { Login } from "@/components/Login";
 import { NEWS_STORIES } from "@/lib/data";
+import { fetchMarketNews } from "@/lib/newsService";
+import { useEffect } from "react";
+import { NewsStory } from "@/lib/types";
 
-type AppPhase = "onboarding" | "selection" | "dashboard" | "stories";
+type AppPhase = "login" | "onboarding" | "selection" | "dashboard" | "stories";
 
 export default function Home() {
-  const [phase, setPhase] = useState<AppPhase>("onboarding");
+  const [phase, setPhase] = useState<AppPhase>("login");
   const [selectedSymbols, setSelectedSymbols] = useState<string[]>([]);
   const [userGoals, setUserGoals] = useState<string[]>([]);
+  const [liveStories, setLiveStories] = useState<NewsStory[]>([]);
+
+  useEffect(() => {
+    async function loadNews() {
+      const news = await fetchMarketNews();
+      if (news.length > 0) {
+        setLiveStories(news);
+      }
+    }
+    loadNews();
+  }, []);
+
+  const storiesToUse = liveStories.length > 0 ? liveStories : NEWS_STORIES;
 
   // Filtering stories based on selected symbols
-  // If no symbols selected (unlikely due to UI), show all
-  const filteredStories = NEWS_STORIES.filter((story) =>
+  const filteredStories = storiesToUse.filter((story) =>
     story.impact.affectedSymbols.some((symbol) =>
       selectedSymbols.includes(symbol)
     )
   );
 
-  // Fallback to all stories if filtering results in too few stories for the demo
-  const displayStories = filteredStories.length > 0 ? filteredStories : NEWS_STORIES;
+  // Fallback to stories that mention ANY selected symbol, or just show latest if none match
+  const displayStories = filteredStories.length > 0 ? filteredStories : storiesToUse;
 
   const handleOnboardingComplete = (goals: string[]) => {
     setUserGoals(goals);
@@ -45,6 +61,10 @@ export default function Home() {
 
   return (
     <main className="min-h-screen bg-background">
+      {phase === "login" && (
+        <Login onLogin={() => setPhase("onboarding")} />
+      )}
+
       {phase === "onboarding" && (
         <Onboarding onComplete={handleOnboardingComplete} />
       )}
@@ -56,6 +76,7 @@ export default function Home() {
       {phase === "dashboard" && (
         <Dashboard
           onStartStories={handleStartStories}
+          onManageAssets={() => setPhase("selection")}
           selectedSymbols={selectedSymbols}
         />
       )}
