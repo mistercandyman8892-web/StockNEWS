@@ -61,7 +61,15 @@ class AppProvider with ChangeNotifier {
       }
     } catch (e) {
       debugPrint("Google Sign-In failed: $e");
+      // If it fails (usually due to missing platform config in dev),
+      // we still want the user to be able to use the app for now.
     }
+  }
+
+  void loginAsGuest() {
+    _userName = "Guest Trader";
+    _isLoggedIn = true;
+    notifyListeners();
   }
 
   Future<void> logout() async {

@@ -107,6 +107,17 @@ class LoginScreen extends StatelessWidget {
                 ),
               ),
             ),
+            const SizedBox(height: 16),
+            TextButton(
+              onPressed: () => context.read<AppProvider>().loginAsGuest(),
+              child: Text(
+                'Continue as Guest',
+                style: TextStyle(
+                  color: colorScheme.primary.withValues(alpha: 0.6),
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
             const SizedBox(height: 24),
             Text(
               'By continuing, you agree to our Terms of Service.',
